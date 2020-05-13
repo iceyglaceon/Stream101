@@ -1,0 +1,8 @@
+<!DOCTYPE StreamControl>
+<items>
+ <timestamp>1589412110</timestamp>
+ <downtime>Timer</downtime>
+ <timerEnable>1</timerEnable>
+ <timerLength>03:10</timerLength>
+ <timerStart>1589412110</timerStart>
+</items>

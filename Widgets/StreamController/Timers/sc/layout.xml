@@ -1,0 +1,23 @@
+<!DOCTYPE StreamControlLayout>
+<layout width="475" height="240" tabbed="1">
+ <tab name="Downtime">
+<!--[Above] Tab Name. You can add as many tabs as you want. I think. -->
+<!-- [Below] Label for the following editable text field. Positioning (x,y) and Height/Width are required. Label will be immutable.-->
+  <label x="10" y="14" width="75" height="13">Downtime</label>
+<!-- Editable Text Field. .csv is the file that what you enter in will save to, allows autocomplete. Dropdown menu not applicable here. -->
+  <lineEdit id="downtime" x="80" y="10" width="290" height="20" dataSet="downtime.csv" />
+  <label x="10" y="44" width="75" height="13">Countdown</label>
+  <!-- ComboBox, Otherwise known as a dropdown list. -->
+  <comboBox id="timerLength" editable="1" x="80" y="40" width="100" height="20">
+    <comboItem>01:00</comboItem>
+    <!-- Starting Value-->
+    <comboItem selected='1'>03:10</comboItem>
+    <comboItem>05:00</comboItem>
+    <comboItem>10:00</comboItem>
+    <!-- See if you can limit comboItems to be editable. Instead of the entire property. -->
+  </comboBox>
+  <!-- Checkbox. -->
+  <checkBox id="timerEnable" x="190" y="40" width="80" height="20">Show Timer</checkBox>
+  <button type="timestamp" id="timerStart" x="376" y="10" width="90" height="53" saveonclick="1">Start Timer</button>
+ </tab>
+</layout>

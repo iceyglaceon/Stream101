@@ -1,0 +1,198 @@
+<html>
+
+<head>
+	<script src="../js/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>
+	<script src="../js/gsap/TweenMax.js" type="text/javascript" charset="utf-8"></script>
+
+<style text="text/CSS">
+
+	@font-face { src:url("../fonts/.ttf"); font-family: ""; }
+
+	body {
+		width: 1920px;
+		height: 1080px;
+		margin: 0px;
+		padding: 0px;
+		overflow: hidden;
+		font-family: "Arial";
+		color: white;
+		text-transform: uppercase;
+		//text-shadow: 5px 8px 5px #0c1b28;
+		background: transparent;
+        -webkit-font-smoothing: antialiased;
+		//letter-spacing: 1px;
+	}
+
+	#textWrapper {
+		display: block;
+		position: absolute;
+		width: 1920px;
+		height: 200px;
+		text-align: center;
+		line-height: 200px;
+		font-size: 130px;
+		top: 600px;
+		opacity: 0;
+	}
+
+	#time {
+		position: absolute;
+		width: 1920px;
+		height: 200px;
+		text-align: center;
+		line-height: 120px;
+		font-size: 120px;
+		top: 700px;
+		display: block;
+		opacity: 0;
+	}
+
+	#allWrapper {
+		display: none;
+	}
+
+</style>
+
+</head>
+
+<body>
+	<div id="allWrapper">
+		<div id="textWrapper">
+			<div id="text"></div>
+		</div>
+		<div id="time"></div>
+	</div>
+
+<script type="text/javascript">
+
+	window.onload = init;
+
+	function init(){
+		$('#allWrapper').css('display','block');
+
+		var streamJSON = "../sc/streamcontrol.json";
+		var xhttp = new XMLHttpRequest();
+		var firstUpdate = true;
+		var scObj;
+		var timerTarget;
+		var animated = 0;
+		var wrapper1 = $("#textWrapper");
+
+		function Build(){
+				setTimeout(downtime,300);
+		}
+
+		Build();
+
+		xhttp.overrideMimeType('application/json');
+
+		xhttp.onreadystatechange = parseJSON;
+
+		pollHandler();
+		setInterval(function(){pollHandler();}, 500);
+
+		function pollHandler(){
+			xhttp.open('GET',streamJSON,true);
+			xhttp.send();
+		}
+
+		function parseJSON() {
+			if (xhttp.readyState === 4) {
+				scObj = JSON.parse(xhttp.responseText);
+				if(animated != 0){
+					downtime();
+				}
+			}
+		}
+
+		function downtime(){
+			getText();
+			timerCheck();
+			getTarget();
+			getTimer();
+		}
+
+
+		function getText(){
+			var downtimeText = scObj["downtime"];
+			if($("#text").text() != downtimeText) {
+				if(firstUpdate == true){
+					$("#text").html(downtimeText);
+					wrapper1.each(function(i, wrapper1) {
+						while(wrapper1.scrollWidth > wrapper1.offsetWidth || wrapper1.scrollHeight > wrapper1.offsetHeight) {
+							var newFontSize = (parseFloat($(wrapper1).css('font-size').slice(0, -2)) * 0.95) + 'px';
+							$(wrapper1).css('font-size', newFontSize);
+						}
+					});
+					TweenMax.to("#textWrapper",1.1,{css:{opacity:1},delay:0});
+					firstUpdate = false;
+					animated++;
+				}
+				else {
+					TweenMax.to("#textWrapper",.5,{css:{opacity: '0'},delay:0,onComplete:function(){
+						$("#textWrapper").css("font-size",'120px');
+						$("#text").html(downtimeText);
+						wrapper1.each(function(i, wrapper1) {
+							while(wrapper1.scrollWidth > wrapper1.offsetWidth || wrapper1.scrollHeight > wrapper1.offsetHeight) {
+								var newFontSize = (parseFloat($(wrapper1).css('font-size').slice(0, -2)) * 0.95) + 'px';
+								$(wrapper1).css('font-size', newFontSize);
+							}
+						});
+						TweenMax.to("#textWrapper",.5,{css:{opacity:1},delay:.3});
+					}});
+				}
+			}
+		}
+
+		function getTarget(){
+			timerStart = scObj["timerStart"];
+			timerLength = scObj["timerLength"];
+			var timerArray = timerLength.split(":");
+			timerTarget = new Date((timerStart * 1000) + (timerArray[0] * 60 * 1000) + (timerArray[1] * 1000) + 1200);
+		}
+
+		function getTimer(){
+			var current = new Date();
+			var remainder = timerTarget - current;
+			if(remainder <= 0){
+				$("#time").html("Now!");
+			}
+			else{
+				$("#time").html(getCountdown(remainder));
+			}
+		}
+
+		function getCountdown(x){
+			var minutes = Math.floor(x / (60 * 1000) % 60);
+			var seconds = Math.floor(x / 1000 % 60);
+			var countdown = minutes + ':' + ('0' + seconds).slice(-2);
+			return countdown;
+		}
+
+		function timerCheck(){
+			var timerEnable = scObj["timerEnable"];
+			if(timerEnable == 0){
+				setTimeout(hideTimer(),30);
+			}
+			else if(timerEnable == 1){
+				showTimer();
+			}
+		}
+
+		function hideTimer(){
+			TweenMax.to("#time",.5,{css:{opacity: '0'},delay:0});
+			TweenMax.to("#textWrapper",.4,{css:{y: '-0px'},delay:.2,ease:Quad.easeOut});
+		}
+
+		function showTimer(){
+			TweenMax.to("#textWrapper",.4,{css:{y: '-70px'},delay:0,ease:Quad.easeOut,onComplete:function(){
+				TweenMax.to("#time",.3,{css:{opacity: '1'},delay:0});
+			}});
+		}
+	}
+
+</script>
+
+</body>
+
+</html>
